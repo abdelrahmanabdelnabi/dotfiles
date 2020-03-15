@@ -136,3 +136,5 @@ eval "$(rbenv init -)"
 
 alias clip='xclip -selection clipboard'
 alias config='/usr/bin/git --git-dir=/home/abdelrahman/.cfg/ --work-tree=/home/abdelrahman'
+alias docc='docker-compose'
+

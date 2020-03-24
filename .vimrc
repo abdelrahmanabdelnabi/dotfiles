@@ -70,6 +70,8 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 
 call plug#end()
 
+set nocompatible
+
 " set clipboard=unnamed
 
 " colors

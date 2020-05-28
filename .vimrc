@@ -101,7 +101,7 @@ set termguicolors
 " let g:gruvbox_italic=1
 " let g:gruvbox_contrast_dark='dark'
 " colorscheme gruvbox
-colorscheme solarized8_high
+colorscheme gruvbox
 
 let NERDTreeQuitOnOpen = 1
 let NERDTreeMinimalUI = 1
@@ -134,6 +134,11 @@ let g:indentLine_char = '│'
 
 " Return to last edit position when opening files (You want this!)
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview(), <bang>0)
 
 " """""""""""""""""""""""
 " key mappings

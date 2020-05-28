@@ -69,7 +69,10 @@ COMPLETION_WAITING_DOTS="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git zsh-syntax-highlighting
+  # zsh-autosuggestions
 )
+
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#808080"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -138,3 +141,8 @@ alias clip='xclip -selection clipboard'
 alias config='/usr/bin/git --git-dir=/home/abdelrahman/.cfg/ --work-tree=/home/abdelrahman'
 alias docc='docker-compose'
 
+# Pretty print the path
+alias path='echo $PATH | tr -s ":" "\n"'
+
+alias :q=exit
+alias :wq=exit

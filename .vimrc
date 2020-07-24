@@ -37,20 +37,20 @@ Plug 'Raimondi/delimitMate'
 
 " for Rails
 Plug 'tpope/vim-rails'
-" Plug 'tpope/vim-endwise' " auto insert end keyword after if/def/do
+Plug 'tpope/vim-endwise' " auto insert end keyword after if/def/do
 
 " ctags list
 Plug 'majutsushi/tagbar'
 
 " autocomplete with tab
-Plug 'ervandew/supertab'
+" Plug 'ervandew/supertab'
 
 " syntax highlighting for javascript
 Plug 'pangloss/vim-javascript'
 
 " syntax highlighting for typescript
 Plug 'leafgarland/typescript-vim'
-Plug 'Quramy/tsuquyomi'
+" Plug 'Quramy/tsuquyomi'
 
 " fuzzy search files
 Plug 'junegunn/fzf.vim'
@@ -83,11 +83,23 @@ Plug 'machakann/vim-swap'
 Plug 'tmux-plugins/vim-tmux-focus-events'
 
 " Linters
-Plug 'w0rp/ale'
+" Plug 'w0rp/ale'
 
 " file tree explorer on demand loading
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
+
+" coc
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-eslint',
+  \ 'coc-prettier',
+  \ 'coc-json'
+  \ ]
+
+Plug 'SirVer/ultisnips'
+Plug 'mlaursen/vim-react-snippets'
 
 call plug#end()
 
@@ -98,9 +110,10 @@ set nocompatible
 " colors
 set background=dark
 set termguicolors
-" let g:gruvbox_italic=1
-" let g:gruvbox_contrast_dark='dark'
-" colorscheme gruvbox
+let g:gruvbox_italic=1
+let g:gruvbox_bold=1
+let g:gruvbox_contrast_dark='hard'
+let g:gruvbox_contrast_light='hard'
 colorscheme gruvbox
 
 let NERDTreeQuitOnOpen = 1
@@ -137,7 +150,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
+  \   'rg --column --line-number --no-heading --color=always --smart-case -g "!{tags,bin,tmp,vendor,.git}" -- '.shellescape(<q-args>), 1,
   \   fzf#vim#with_preview(), <bang>0)
 
 " """""""""""""""""""""""
@@ -153,10 +166,6 @@ nnoremap <silent> <Leader>f :NERDTreeFind<CR>
 
 " Switch between the last two files
 nnoremap <Leader><Leader> <C-^>
-
-" Move between linting errors
-nnoremap ]r :ALENextWrap<CR>
-nnoremap [r :ALEPreviousWrap<CR>
 
 " copy and paste from system clipboard
 noremap <Leader>y "+y
@@ -178,8 +187,99 @@ nnoremap <C-H> <C-W><C-H>
 
 noremap E $
 
-" use F3 to autoformat
-noremap <F3> :Autoformat<CR>
+" ALE config {{{
+" use F3 to autformatting
+" let g:ale_fixers = { 'typescript': ['prettier', 'eslint'], 'javascript': ['prettier', 'eslint'], 'typescriptreact': ['prettier', 'eslint'], 'ruby': 'rubocop' }
+" noremap <F3> :ALEFix<CR>
+
+" Move between linting errors
+" nnoremap ]r :ALENextWrap<CR>
+" nnoremap [r :ALEPreviousWrap<CR>
+" end ALE config }}}
+
+
+" CoC Config {{{
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" CoC mappings
+"
+" Use `[r` and `]r` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [r <Plug>(coc-diagnostic-prev)
+nmap <silent> ]r <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+" nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+" xmap <leader>f  <Plug>(coc-format-selected)
+" nmap <leader>f  <Plug>(coc-format-selected)
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+noremap <F3> :Format<CR>
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Show all diagnostics.
+nnoremap <silent><nowait> <space>d  :<C-u>CocList diagnostics<cr>
+
+" End CoC config }}}
 
 " use backspace in nomral mode
 nnoremap <BS> X
@@ -201,7 +301,7 @@ autocmd VimResized * :wincmd =
 autocmd Filetype python setlocal tabstop=2 shiftwidth=2
 autocmd Filetype ruby setlocal tabstop=2 shiftwidth=2
 autocmd Filetype eruby setlocal tabstop=2 shiftwidth=2
-autocmd Filetype typescript setlocal tabstop=2 shiftwidth=2
+autocmd Filetype typescript,typescriptreact setlocal tabstop=2 shiftwidth=2
 autocmd Filetype html,vue setlocal tabstop=2 shiftwidth=2
 autocmd Filetype yaml setlocal tabstop=2 shiftwidth=2
 autocmd Filetype scss setlocal tabstop=2 shiftwidth=2
@@ -217,9 +317,16 @@ set cindent
 set backspace=2 " Backspace deletes like most programs in insert mode
 set nojoinspaces " Use one space, not two, after punctuation.
 set nobackup
+set nowritebackup
 set noswapfile
 set shell=/usr/bin/zsh
 set clipboard=unnamedplus
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Give more space for displaying messages.
+set cmdheight=2
 
 " auto reload files if there are modified outside vim.
 " (Does not replace current file it has been modified in vim.)
@@ -241,7 +348,7 @@ set gdefault
 set cursorline
 
 " highlight search results
-set hlsearch
+" set hlsearch
 
 " clear the highlighted search result useful when hlsearch is enabled
 nnoremap <silent> <cr> :noh<cr><cr>
@@ -292,5 +399,5 @@ endfunction
 " """""""""""""""""""""
 " Javascript mappings
 " """""""""""""""""""""
-au FileType javascript,vue imap <c-l> console.log();<esc>hi
+au FileType javascript,vue,ts imap <c-l> console.log();<esc>hi
 

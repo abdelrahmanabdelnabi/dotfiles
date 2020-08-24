@@ -160,7 +160,7 @@ command! -bang -nargs=* Rg
 
 " for ctrl-p (jump to file) plugin: open files in version control and include
 " untracked files
-:map <C-p> :GFiles '-o'<CR>
+:map <C-p> :GFiles -c -o --exclude-standard<CR>
 
 " open Gstatus in a vertical split
 command! -nargs=0 G :vertical Gstatus

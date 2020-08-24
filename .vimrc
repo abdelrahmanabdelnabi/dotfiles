@@ -50,7 +50,8 @@ Plug 'pangloss/vim-javascript'
 
 " syntax highlighting for typescript
 Plug 'leafgarland/typescript-vim'
-" Plug 'Quramy/tsuquyomi'
+Plug 'Quramy/tsuquyomi'
+Plug 'peitalin/vim-jsx-typescript'
 
 " fuzzy search files
 Plug 'junegunn/fzf.vim'
@@ -157,8 +158,12 @@ command! -bang -nargs=* Rg
 " key mappings
 " """""""""""""""""""""""
 
-" for ctrl-p (jump to file) plugin
-:map <C-p> :Files<CR>
+" for ctrl-p (jump to file) plugin: open files in version control and include
+" untracked files
+:map <C-p> :GFiles '-o'<CR>
+
+" open Gstatus in a vertical split
+command! -nargs=0 G :vertical Gstatus
 
 " toggle file tree using <leader>e
 nnoremap <silent> <Leader>e :NERDTreeToggle<CR>
@@ -176,6 +181,9 @@ nmap <Leader>t :TagbarToggle<CR>
 nmap <Leader>tn :tabnew<cr>
 nmap <Leader>tc :tabclose<cr>
 nmap <Leader>tm :tabmove
+
+" vertical split
+nmap <Leader>v :vsp<CR>
 
 map Y y$
 
